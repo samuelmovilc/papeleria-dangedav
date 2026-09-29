@@ -811,9 +811,10 @@ function printTicket(venta){
   var jsPDF=window.jspdf?window.jspdf.jsPDF:(window.jsPDF||null);
   if(!jsPDF){toast('Error: jsPDF no cargó. Revisa tu conexión.','error');return;}
 
-  var pw=80; // mm ancho papel
-  var margin=4;
-  var cw=pw-margin*2; // ancho útil
+  var ts = cfg.tamano_ticket || '80mm';
+  var pw = ts === '58mm' ? 58 : 80; // mm ancho papel
+  var margin = 4;
+  var cw = pw - margin * 2; // ancho útil
   var doc=new jsPDF({unit:'mm',format:[pw,297],orientation:'portrait'});
 
   doc.setFont('helvetica','bold');
@@ -1226,7 +1227,9 @@ function exportarResumenMetodos(){
     var jsPDF=window.jspdf?window.jspdf.jsPDF:(window.jsPDF||null);
     if(!jsPDF){toast('Error: jsPDF no cargó','error');return;}
 
-    var pw=80;var margin=4;var cw=pw-margin*2;
+    var ts = configCache.tamano_ticket || '80mm';
+    var pw = ts === '58mm' ? 58 : 80;
+    var margin=4;var cw=pw-margin*2;
     var doc=new jsPDF({unit:'mm',format:[pw,297],orientation:'portrait'});
     doc.setFont('helvetica','bold');
     var y=margin;var lineH=4.5;
@@ -1490,7 +1493,7 @@ async function importExcel(input){
     if(lines.length<2){toast('Archivo inválido','error');input.value='';return}
     var productos=[];
     lines.slice(1).forEach(function(line){
-      var cols=line.split(',').map(function(c){return c.replace(/^"|"$/g,'').trim()});
+      var cols=line.split(/[,;]/).map(function(c){return c.replace(/^"|"$/g,'').trim()});
       if(cols.length>=5&&cols[0]&&cols[1])
         productos.push({id:cols[0],nombre:cols[1],precio_venta:parseFloat(cols[2])||0,precio_compra:parseFloat(cols[3])||0,stock:parseInt(cols[4])||0});
     });
